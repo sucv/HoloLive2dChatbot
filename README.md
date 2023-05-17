@@ -202,7 +202,7 @@ Suppose you have the hologram pyramid, there are several ways to display it depe
 
 I am currently using Option 1. No matter which one you choose, set the app as mentioned above, enable the talk mode, then the Holo mode, place the screen on the pyramid (or place the pyramid on your screen, should you use a heavy screen), and enjoy!
 
-(If you mirror the Live2D model via Safari on iPad, make sure to [make it shown full screen](https://www.ispringsolutions.com/blog/how-to-make-a-website-full-screen-on-the-ipad) manually.)
+(If you mirror the Live2D model via Safari on iPad, make sure to [make it shown (almost) full screen](https://www.ispringsolutions.com/blog/how-to-make-a-website-full-screen-on-the-ipad) on ipad manually. 
 
 
 ## Live2D Model<a name="live2d-model"></a>

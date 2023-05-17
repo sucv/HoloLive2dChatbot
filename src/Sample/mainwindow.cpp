@@ -45,6 +45,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     holoWidget = new QLabel();
     holoWidget->setObjectName("holoWidget");
+//    holoWidget->setStyleSheet("background-color: black;");
 
     holoWidget->hide();
 
