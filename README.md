@@ -1,4 +1,4 @@
-## Table of Content<a name="Table_of_Content"></a>
+## Table of Content<a name="table-of-content"></a>
 
 + [TO-DO](#to-do)
 + [Introduction](#introduction)
@@ -16,14 +16,14 @@
 + [End Note](#end-note)
 
 ## TO-DO<a name="to-do"></a>
-[Return to Table of Content](#Table_of_Content)
+[Return to Table of Content](#table-of-content)
 
 [] Configure `.pro` file for compilation in Linux.
 [] Add more models.
 
 
 ## Introduction<a name="introduction"></a>
-[Return to Table of Content](#Table_of_Content)
+[Return to Table of Content](#table-of-content)
 
 
 After months' thinking, I come up with a practical and controllable idea for the proposal!
@@ -37,7 +37,7 @@ After months' thinking, I come up with a practical and controllable idea for the
 The main idea goes like this. A cute [Live2D](https://www.live2d.com/en/) character (I shall call it Live2D model, or model for convenience) will stay on the bottom right of the user's screen. The model is nothing more than a common [Live2D widget](https://github.com/akiroz/Live2D-Widget), except for the fact that it is capable of vocal and bodily communication. And it can even turn into a hologram model once you activate the holo mode! Conceptually speaking it is similar to the [GateBox](https://www.gatebox.ai/), which is a famous virtual intelligent companion with hologram display as well. That said, we are actually DIY an (almost) free and personalized GateBox.
 
 #### Prerequisites<a name="prerequisites"></a>
-[Return to Table of Content](#Table_of_Content)
+[Return to Table of Content](#table-of-content)
 
 All the prerequisites are listed below.
 
@@ -52,7 +52,7 @@ Fourth, a microphone and speaker.
 Some optional requirements include a Raspberry PI or Nvidia Jetson to make things more nerdy and geeky, and your personal chat log with the target user so that a more **you** companion can be created through chatGPT finetuning.
 
 ## Establishing the Environment<a name="establishing-the-environment"></a>
-[Return to Table of Content](#Table_of_Content)
+[Return to Table of Content](#table-of-content)
 
 We now set up everything before diving into the coding part. First, browse the online shopping platforms and by a hologram pyramid for a 10'-12' screen. You may also [build one manually](https://www.wikihow.com/Make-a-Holographic-Illusion-Pyramid). The pyramid may take one to two weeks to deliver. Also, if you do not have a iPad, then buy or find a LED screen (if you don't mind the annoying wires).
 
@@ -65,12 +65,12 @@ On your PC, there are several things to download/install, they are listed below.
 + [Mirror APP (optional)], which mirror your screen to an iPad. It is required if you don't have a separated screen connected with your PC.
 
 ## Build and Deploy<a name="build-and-deploy"></a>
-[Return to Table of Content](#Table_of_Content)
+[Return to Table of Content](#table-of-content)
 
 (You don't need this if you just download the released app.) To build the project, there are two major steps. 
 
 #### Windows<a name="windows"></a>
-[Return to Table of Content](#Table_of_Content)
+[Return to Table of Content](#table-of-content)
 
 First, locate the path of the `cmake.exe` in your Qt. For me, it is in `E:\Qt\Tools\CMake_64\bin\cmake.exe`. Then, edit `build_component.bat`, adjust Line 4 to
 
@@ -119,16 +119,16 @@ Now `\HoloBot` is a standalone package for the app!!
 
 
 #### Linux<a name="linux"></a>
-[Return to Table of Content](#Table_of_Content)
+[Return to Table of Content](#table-of-content)
 
 To do...
 
 
 ## Usage<a name="usage"></a>
-[Return to Table of Content](#Table_of_Content)
+[Return to Table of Content](#table-of-content)
 
 #### UI<a name="ui"></a>
-[Return to Table of Content](#Table_of_Content)
+[Return to Table of Content](#table-of-content)
 
 The UI of the chatbot is shown below.
 
@@ -147,7 +147,7 @@ The toolbar, from left to right, contains the button for the following functions
 + Help, the message box instructing the key bindings.
 
 #### Settings<a name="settings"></a>
-[Return to Table of Content](#Table_of_Content)
+[Return to Table of Content](#table-of-content)
 
 There are two steps to set the app.
 
@@ -180,7 +180,7 @@ The prompt is the key to make ChatGPT act as your needs. In the default prompt, 
 
 
 #### Hologram<a name="hologram"></a>
-[Return to Table of Content](#Table_of_Content)
+[Return to Table of Content](#table-of-content)
 
 Suppose you have the hologram pyramid, there are several ways to display it depending on your case.
 
@@ -194,7 +194,7 @@ I am currently using Option 1. No matter which one you choose, set the app as me
 
 
 ## Model<a name="model"></a>
-[Return to Table of Content](#Table_of_Content)
+[Return to Table of Content](#table-of-content)
 
 Before import a new model, you need to do the follows.
 
@@ -211,14 +211,14 @@ To import more models, simply copy/paste the model folder under `Resources` fold
 Restart the app to load the imported model.
 
 ## Pipeline<a name="pipeline"></a>
-[Return to Table of Content](#Table_of_Content)
+[Return to Table of Content](#table-of-content)
 
 ![](screenshots/pipeline.jpg "The pipeline of the app.")
 > The input, should it be voice, will be converted to text by Azure. It is then combined to form the "messages" for OpenAI API format. The output from ChatGPT is in JSON format, containing three keys: "Expressions", "Motions", and "Content". The "Expressions" and "Motions" are used to animate the Live2D model, and the "Content" will be voiced by Azure and also stitched to the "messages". Loop until the user terminates the talk session. The chat history is temporarily saved and will be read if user restart the chat or talk session, unless the user resets the history or closes the app.
 
 
 ## End Note<a name="end-note"></a>
-[Return to Table of Content](#Table_of_Content)
+[Return to Table of Content](#table-of-content)
 
 Thanks [duanxianpi](https://github.com/duanxianpi/QtLive2d) for creating the QtLive2D Widget and his timely support. Thanks [ChatGPT](https://chat.openai.com/) for the super helpful guidance on each technical problems. Frankly speaking I know nothing about C++ and Qt. It is ChatGPT who helped me realize this app. (No, I write this ReadMe by myself :)
 
