@@ -18,8 +18,8 @@
 ## TO-DO<a name="to-do"></a>
 [Return to Table of Content](#table-of-content)
 
-[] Configure `.pro` file for compilation in Linux.
-[] Add more models.
+- [ ] Configure `.pro` file for compilation in Linux.
+- [ ] Add more models.
 
 
 ## Introduction<a name="introduction"></a>
