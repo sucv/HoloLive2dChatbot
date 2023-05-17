@@ -193,7 +193,7 @@ I am currently using Option 1. No matter which one you choose, set the app as me
 (If you mirror the Live2D model via Safari on iPad, make sure to [make it shown full screen](https://www.ispringsolutions.com/blog/how-to-make-a-website-full-screen-on-the-ipad) manually.)
 
 
-## Model<a name="model"></a>
+## Live2D Model<a name="live2d-model"></a>
 [Return to Table of Content](#table-of-content)
 
 Before import a new model, you need to do the follows.
