@@ -1,0 +1,8 @@
+build/
+*.user
+
+src/Sample/opencv/
+src/Sample/curl/
+
+src/Sample/*.user
+src/Framework/*.user
