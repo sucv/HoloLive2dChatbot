@@ -30,6 +30,7 @@
 [Return to Table of Content](#table-of-content)
 
 - [ ] Configure `.pro` file for compilation in Linux.
+- [ ] Fix the bug in which the fullscreen doesn't automatically fill the screen with black background if the PC screen aspect ratio is 4:3.
 - [ ] Add more models.
 
 
