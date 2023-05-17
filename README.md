@@ -1,3 +1,14 @@
+## Showcase
+
+![](screenshots/demo_chat.gif "The chat mode.")
+> Chat with a cute and live ChatGPT!
+
+![](screenshots/demo_holo1.gif "The holo mode.")
+> This is the fullscreen holo mode. It is used to project the hologram using a pyramid!
+
+![](screenshots/demo_holo2.gif "The holo mode.")
+> This is the actual hologram displayed using the pyramid! The expression is changing.
+
 ## Table of Content<a name="table-of-content"></a>
 
 + [TO-DO](#to-do)
@@ -184,8 +195,8 @@ The prompt is the key to make ChatGPT act as your needs. In the default prompt, 
 
 Suppose you have the hologram pyramid, there are several ways to display it depending on your case.
 
-1. You have a PC and an iPad: install a mirror app in your PC, and then mirror your screen to an iPad. (There are numerous mirror apps available online.)
-2. You have a PC and a flat LED screen: simply connect the screen to your PC.
+1. You have a PC and an iPad: install a mirror app in your PC, and then mirror your screen to an iPad. (There are numerous mirror apps available online, such as this [awesome one](https://github.com/H-M-H/Weylus). See [this issue](https://github.com/H-M-H/Weylus/issues/140) if you use Win11.) The downside is that iPad supports 4:3 ratio whereas normal monitor is usually in 16:9. Therefore we have to adjust the PC resolution to 4:3 to mirror it properly.
+2. You have a PC and a flat LED screen: simply connect the screen to your PC. The good thing is that the LED screen can mostly support 16:9 ratio.
 3. You have a Raspberry PI or Nvidia Jetson, on which placed embedded a small screen: this makes the who system portable.
 
 I am currently using Option 1. No matter which one you choose, set the app as mentioned above, enable the talk mode, then the Holo mode, place the screen on the pyramid (or place the pyramid on your screen, should you use a heavy screen), and enjoy!
