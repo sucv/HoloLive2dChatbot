@@ -4,7 +4,7 @@
 + [Introduction](#introduction)
 	+ [Prerequisites](#prerequisites)
 + [Establishing the Environment](#establishing-the-environment)
-+ [Build and Deploy](#BUILD)
++ [Build and Deploy](#build-and-deploy)
 	+ [Windows](#windows)
 	+ [Linux](#linux)
 + [Usage](#usage)
