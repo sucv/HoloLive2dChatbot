@@ -233,7 +233,7 @@ To do...
 ## End Note<a name="end-note"></a>
 [Return to Table of Content](#table-of-content)
 
-Thanks [@duanxianpi](https://github.com/duanxianpi/QtLive2d) for creating the QtLive2D Widget and his timely support. Thanks [ChatGPT](https://chat.openai.com/) for the super helpful guidance on every trivial/critical technical problems. Frankly speaking I know nothing about C++ and Qt. It is ChatGPT who helped me realize this app.
+Thanks [@duanxianpi](https://github.com/duanxianpi/QtLive2d) for creating the QtLive2D Widget and his timely support. Thanks [ChatGPT](https://chat.openai.com/) for the super helpful guidance on every trivial/critical technical problem. Frankly speaking I know nothing about C++ and Qt. It is ChatGPT who helped me realize this app.
 
 Please excuse any inappropriate C++ coding and English writing.
 
