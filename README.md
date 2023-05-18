@@ -14,16 +14,14 @@
 + [TO-DO](#to-do)
 + [Introduction](#introduction)
 	+ [Prerequisites](#prerequisites)
-+ [Establishing the Environment](#establishing-the-environment)
-+ [Build and Deploy](#build-and-deploy)
-	+ [Windows](#windows)
-	+ [Linux](#linux)
 + [Usage](#usage)
 	+ [UI](#ui)
 	+ [Settings](#settings)
 	+ [Hologram](#hologram)
 + [Live2D Model](#live2d-model)
-+ [Pipeline](#pipeline)
++ [Build and Deploy](#build-and-deploy)
+	+ [Windows](#windows)
+	+ [Linux](#linux)
 + [End Note](#end-note)
 
 ## TO-DO<a name="to-do"></a>
@@ -37,103 +35,38 @@
 ## Introduction<a name="introduction"></a>
 [Return to Table of Content](#table-of-content)
 
+The goal is to develop a ChatGPT-based Live2D chatbot with hologram display.
 
-After months' thinking, I come up with a practical and controllable idea for the proposal!
++ The development shall base on Qt6/C++, which is totally new to me.
++ The Live2D chatbot shall either dock on the screen as a standard Live2D widget, or display in the holographic mode on a hologram pyramid.
++ The Live2D chatbot shall support voice and keyboard interaction, with natural expressions and even body motions.
 
-+ Develop a ChatGPT-based Live2D chatbot with hologram display.
-	+ The development shall base on Qt6/C++, which is totally new to me.
-	+ The Live2D chatbot shall either dock on the screen as a standard Live2D widget, or display in the holographic mode on a hologram pyramid.
-	+ The Live2D chatbot shall support voice and keyboard interaction, with natural expressions and even body motions.
-	+ The whole development process shall be well-archived and reproducible.
+The workflow of the project is like follows.
 
-The main idea goes like this. A cute [Live2D](https://www.live2d.com/en/) character (I shall call it Live2D model, or model for convenience) will stay on the bottom right of the user's screen. The model is nothing more than a common [Live2D widget](https://github.com/akiroz/Live2D-Widget), except for the fact that it is capable of vocal and bodily communication. And it can even turn into a hologram model once you activate the holo mode! Conceptually speaking it is similar to the [GateBox](https://www.gatebox.ai/), which is a famous virtual intelligent companion with hologram display as well. That said, we are actually DIY an (almost) free and personalized GateBox.
+![](screenshots/pipeline.jpg "The pipeline of the app.")
+> The input, should it be voice, will be converted to text by Azure. It is then combined to form the "messages" for OpenAI API format. The output from ChatGPT is in JSON format, containing three keys: "Expressions", "Motions", and "Content". The "Expressions" and "Motions" are used to animate the [Live2D](https://www.live2d.com/en/) model, and the "Content" will be voiced by Azure and also stitched to the "messages". The Live2D model can be duplicated by OpenCV for holographic display. The process Loops until the user terminates the talk session. The chat history is temporarily kept and will be read if user restart the chat or talk session, unless the user resets the history or closes the app. 
 
 #### Prerequisites<a name="prerequisites"></a>
 [Return to Table of Content](#table-of-content)
 
 All the prerequisites are listed below.
 
-First things first, a [PC](https://en.wikipedia.org/wiki/Personal_computer) is required. The development environment can be [Windows 10/11](https://www.microsoft.com/software-download/windows11) + [MSVC compiler](https://visualstudio.microsoft.com/vs/older-downloads/#visual-studio-2019-and-other-products) or [Ubuntu20/22](https://ubuntu.com/download/desktop) + [GCC compiler](https://linuxize.com/post/how-to-install-gcc-on-ubuntu-20-04/), with the [Qt Creator](https://github.com/qt-creator/qt-creator) as the [IDE](https://en.wikipedia.org/wiki/Integrated_development_environment). Also, a mirror APP is needed so that you can mirror your PC screen to a mobile device for hologram display (using a pyramid) through Wifi. A simple google (maybe new Bing nowadays) search can find you plenty of such apps.
+If you directly download the release:
 
-Second, an [OpenAI API key](https://platform.openai.com/docs/introduction) for chatGPT calls and a [Microsoft Azure API key](https://learn.microsoft.com/en-us/azure/search/search-security-api-keys?tabs=portal-use%2Cportal-find%2Cportal-query) for speech-to-text and text-to-speech services are required. When you speak to the Live2D character, your words will be conversed to texts using Azure's speech-to-text API and sent to chatGPT. The latter's response will be sent to Azure's text-to-speech service so that the model can "speak".
-
-Third, a [hologram pyramid](https://www.wikihow.com/Make-a-Holographic-Illusion-Pyramid) and a flat screen are required. The hologram pyramid can be easily found from multiple online shopping platforms. The pyramid's size depends on the screen size. For the latter, a 10'-12' iPad would be the best choice because its size, well-designed appearance, and functionality are just so perfect! Anyway, choose your pyramid based on your screen!
-
-Fourth, a microphone and speaker. 
++ PC.
++ an [OpenAI API key](https://platform.openai.com/docs/introduction) for chatGPT calls and a [Microsoft Azure API key](https://learn.microsoft.com/en-us/azure/search/search-security-api-keys?tabs=portal-use%2Cportal-find%2Cportal-query) for speech-to-text and text-to-speech services. When you speak to the Live2D character, your words will be conversed to texts using Azure's speech-to-text API and sent to chatGPT. The latter's response will be sent to Azure's text-to-speech service so that the model can "speak".
++ A secondary screen, be it a LED screen or iPad. The size is best in 10'-12'.
+	+ If you use iPad or similar mobile device as the secondary screen for wireless display, you will also need a mirror APP on your PC, such as [this one](https://github.com/H-M-H). (Should you use it on Win11, check [this](https://github.com/H-M-H/Weylus/issues/140))
++ A [hologram pyramid](https://www.wikihow.com/Make-a-Holographic-Illusion-Pyramid). You may [create one manually](https://www.wikihow.com/Make-a-Holographic-Illusion-Pyramid), or but it from online shopping platform. Make sure its size is compatible with the screen size above.
++ A microphone and speaker.
 
 Some optional requirements include a Raspberry PI or Nvidia Jetson to make things more nerdy and geeky, and your personal chat log with the target user so that a more **you** companion can be created through chatGPT finetuning.
 
-## Establishing the Environment<a name="establishing-the-environment"></a>
-[Return to Table of Content](#table-of-content)
+If you would like to amend and build the project:
 
-We now set up everything before diving into the coding part. First, browse the online shopping platforms and by a hologram pyramid for a 10'-12' screen. You may also [build one manually](https://www.wikihow.com/Make-a-Holographic-Illusion-Pyramid). The pyramid may take one to two weeks to deliver. Also, if you do not have a iPad, then buy or find a LED screen (if you don't mind the annoying wires).
-
-On your PC, there are several things to download/install, they are listed below.
-	
-+ [Visual Studio and MSVC compiler](https://visualstudio.microsoft.com/vs/older-downloads/#visual-studio-2019-and-other-products) for Windows PC or [GCC compiler](https://linuxize.com/post/how-to-install-gcc-on-ubuntu-20-04/) for Ubuntu PC. When install the Visual Studio, tick "Desktop Development with C++".
-+ [Qt Creator](https://github.com/qt-creator/qt-creator), which is an IDE specifically for Qt. It will be used to build the project with the MSVC (Windows) or GCC (Linux) compiler.
-+ [Git Bash](https://git-scm.com/download/win) (Windows only), we will use it to run the bat script on Windows. When install, simply click Next, no need to change the default setting except for the installation path. If you are using Linux, install the Git command.
-+ [System Environment Variable](https://www.computerhope.com/issues/ch000549.htm), add [OpenAI API key](https://platform.openai.com/docs/introduction) and [Microsoft Azure API key](https://learn.microsoft.com/en-us/azure/search/search-security-api-keys?tabs=portal-use%2Cportal-find%2Cportal-query) as your environment variables. The two keys will be free for one month if you are new user. After which, they will switch to pay-as-you-go. Their charge is trivial, therefore, it does no harm to use them. (During the whole (1.5 month) development of this project, I was only charged for about 3 dollars in total.)
-+ [Mirror APP (optional)], which mirror your screen to an iPad. It is required if you don't have a separated screen connected with your PC.
-
-## Build and Deploy<a name="build-and-deploy"></a>
-[Return to Table of Content](#table-of-content)
-
-(You don't need this if you just download the released app.) To build the project, there are two major steps. 
-
-#### Windows<a name="windows"></a>
-[Return to Table of Content](#table-of-content)
-
-First, locate the path of the `cmake.exe` in your Qt. For me, it is in `E:\Qt\Tools\CMake_64\bin\cmake.exe`. Then, edit `build_component.bat`, adjust Line 4 to
-
-```
-set CMAKE=path\to\your\cmake.exe
-```
-
-Then, launch `Git Bash`, `cd` to the project root path, run the `build_component.bat` script in the Git Bash by
-
-```
-./build_component.bat
-```
-
-The batch script will download, build, and install OpenSSL, Curl, and OpenCV, and finally delete all unnecessary resources.
-
-
-Second, launch your Qt Creator, Open Project --> locate the project folder --> choose the `.pro` file to open. Then click `Run` button on the bottom left. An executable `HoloBot.exe` will be generated (inside something like `build-HoloLive2dChatbot-Desktop_Qt_6_5_0_MSVC2019_64bit-Release`). And we are ready to deploy. 
-
-First, ensure that `VCINSTALLDIR` is set in your [System Environment Variable](https://www.computerhope.com/issues/ch000549.htm). I set it to `D:\VisualStudio2019\VC` as I installed the VS to disk D. Then, locate the path of the `windeployqt.exe` in your Qt. For me, it is in `E:\Qt\6.5.0\msvc2019_64\bin\windeployqt.exe`. Make sure its version (6.5.0) is the same as your working Qt version. There could be multiple `windeployqt.exe` existed in your Qt. For me, I have another one of version `6.4.1` in `E:\Qt\Tools\QtDesignStudio\qt6_design_studio_reduced_version\bin` which is not compatible with my Qt 6.5.0. 
-
-Second, copy `HoloBot.exe` to an empty folder, lets call it `\HoloBot\HoloBot.exe`, in that folder, launch Git Bash, copy all the dependencies to this folder by
-
-```
-E:\Qt\6.5.0\msvc2019_64\bin\windeployqt.exe . --compiler-runtime
-``` 
-
-Make sure there is no error returned. The command will generate the following dependencies.
-
-![](screenshots/deploy.png "The generated dependencies.")
-> All except `HoloBot.exe` are automatically generated. Make sure `vc_redist_x64.exe` is there!
-
-
-
-
-Finally, manually copy the follows to `\HoloBot\`.
-
-+ `libcurl.dll`
-+ `Microsoft.CognitiveServices.Speech.core.dll`
-+ `Microsoft.CognitiveServices.Speech.extension.audio.sys.dll`
-+ `Microsoft.CognitiveServices.Speech.extension.codec.dll`
-+ `opencv_core470.dll`, `opencv_highgui470.dll`, `opencv_imgcodecs470.dll`, `opencv_imgproc470.dll`
-+ `Resources` folder (don't forget this!)
-
-
-Now `\HoloBot` is a standalone package for the app!!
-
-
-#### Linux<a name="linux"></a>
-[Return to Table of Content](#table-of-content)
-
-To do...
++ [Windows 10/11](https://www.microsoft.com/software-download/windows11) + [MSVC compiler](https://visualstudio.microsoft.com/vs/older-downloads/#visual-studio-2019-and-other-products) or [Ubuntu20/22](https://ubuntu.com/download/desktop) + [GCC compiler](https://linuxize.com/post/how-to-install-gcc-on-ubuntu-20-04/). Note that Windows + Mingw and Windows + GCC are not compatible. Note that When install the Visual Studio, tick "Desktop Development with C++".
++ [Qt Creator](https://github.com/qt-creator/qt-creator), which is an IDE specifically for Qt. Install this will also install all necessary Qt libraries.
++ [Git Bash](https://git-scm.com/download/win) (Windows only), we will use it to run the bat script on Windows. When install, simply click Next, no need to change the default setting except for the installation path.
 
 
 ## Usage<a name="usage"></a>
@@ -177,13 +110,12 @@ voice=zh-CN-XiaoyiNeural
 ```
 
 You may
+ 
+1. switch the order of them (put your desired under \[1\] for convenience, but make sure you follow the format and assign one language for one group), and 
+3. add a new voice. 
+	+ Visit the [voice gallery](https://speech.microsoft.com/portal/193919d8d6294e799745bbe666cdea3c/voicegallery) from Azure website. Once you chose a voice, you should see the corresponding example code, from which you can find the voice name, for example, `en-US-GuyNeural`, then add it to `languages.ini`. 
 
-1. add more language, 
-2. switch the order of them (put your desired under \[1\] for convenience, but make sure you follow the format and assign one language for one group), and 
-3. choose a different voice. 
-	+ To choose a different voice, visit the [voice gallery](https://speech.microsoft.com/portal/193919d8d6294e799745bbe666cdea3c/voicegallery) from Azure website. Once you chose a voice, you should see the corresponding example code, from which you can find the voice name, for example, `en-US-GuyNeural`, then add it to `languages.ini`. 
-
-The `Settings` tool looks like this.
+The `Settings` dialog looks like this.
 
 ![](screenshots/Settings.png "The Settings dialog of the bot.")
 > The Setting dialog of the chatbot. From which you can choose the Live2D model, the prompt txt file, and languages. The languages are retrieved from `languages.ini`.
@@ -194,15 +126,33 @@ The prompt is the key to make ChatGPT act as your needs. In the default prompt, 
 #### Hologram<a name="hologram"></a>
 [Return to Table of Content](#table-of-content)
 
-Suppose you have the hologram pyramid, there are several ways to display it depending on your case.
+Suppose you already have the hologram pyramid, there are several ways to display it depending on your case.
 
-1. You have a PC and an iPad: install a mirror app in your PC, and then mirror your screen to an iPad. (There are numerous mirror apps available online, such as this [awesome one](https://github.com/H-M-H/Weylus). See [this issue](https://github.com/H-M-H/Weylus/issues/140) if you use Win11.) The downside is that iPad supports 4:3 ratio whereas normal monitor is usually in 16:9. Therefore we have to adjust the PC resolution to 4:3 to mirror it properly.
-2. You have a PC and a flat LED screen: simply connect the screen to your PC. The good thing is that the LED screen can mostly support 16:9 ratio.
-3. You have a Raspberry PI or Nvidia Jetson, on which placed embedded a small screen: this makes the who system portable.
+1. You have a PC and an iPad (or any other mobile device): install a mirror app in your PC, and then mirror your screen to an iPad. 
+	+ Pros
+		+ iPad is lightweight and you probably have one.
+		+ No annoying wires.
+	+ Cons
+		+ iPad has 4:3 aspect ratio whereas a normal PC monitor is usually in 16:9. You have to change the latter to 4:3 when mirroring.
+		+ Currently you will have to manually set the wallpaper of your PC to solid black, and also hide the taskbar/dock to make a pseudo-fullscreen effect. Because once the PC resolution changed to 4:3, the Qt fullscreen function won't fill the screen with black, instead it will be transparent. I will find a workaround for this.
+2. You have a PC and a flat LED screen: simply connect the screen to your PC. 
+	+ Pros
+		+ If the LED screen support 16:9 aspect ratio, then you don't need to adjust your PC display and set the pseudo-fullscreen.
+	+ Cons
+		+ The LED screen may not as light and thin as iPad is.
+		+ Cables for LED's power and display (HDMI) are annoying.		
+3. You have a Raspberry PI or Nvidia Jetson, on which placed embedded a small screen.
+	+ Pros
+		+ Highly portable, especially if you also use wireless microphone.
+	+ Cons
+		+ Hologram size may be limited due to small screen size. 
 
-I am currently using Option 1. No matter which one you choose, set the app as mentioned above, enable the talk mode, then the Holo mode, place the screen on the pyramid (or place the pyramid on your screen, should you use a heavy screen), and enjoy!
+(I am currently on Option 1.) No matter which one you choose, to enable the hologram, you should:
 
-(If you mirror the Live2D model via Safari on iPad, make sure to [make it shown (almost) full screen](https://www.ispringsolutions.com/blog/how-to-make-a-website-full-screen-on-the-ipad) on ipad manually. 
+1. configure the app as mentioned in [here](#settings), 
+2. enable the talk mode, 
+3. enable the Holo mode, and
+4. place the screen on the pyramid (or place the pyramid on your screen, should you use a heavy screen).
 
 
 ## Live2D Model<a name="live2d-model"></a>
@@ -215,19 +165,70 @@ Before import a new model, you need to do the follows.
 	+ How to determine the correct name? Go to an Live2D online viewer like [this one](https://guansss.github.io/live2d-viewer-web/), drag your model folder to it and play each expression and/or motion. By which you should be able to eyeball and name them. Make them distinguishable to each other. For example, for expressions, there are several [basic emotions](https://en.wikipedia.org/wiki/Emotion) to name, including `Happy`, `Sad`, `Disgusting`, `Fear`, `Angry`, `Neutral`, `Surprised`, and `Contempt`, and for motions, consider `Smile`, `Cry`, `Laugh`, `Doubt`, `Jump`, etc... Restructure the json if necessary. See the existing model json files (such as `Resources/Wanko_touch/Wanko_touch.model3.json` and `Resources/Haru/Haru.model3.json`) for reference.
 + If the model's predefined expressions and motions do not satisfy you, you can use [Live2D Editor](https://www.live2d.com/en/) to create more. I am very new to this but there are plenty of tutorials online. Alternatively, you may pay someone to create a custom model for you.
 
-To import more models, simply copy/paste the model folder under `Resources` folder. The model structure looks like this.
+To import more models, simply copy/paste the model folder under `Resources` folder. The model folder structure looks like this.
 
 ![](screenshots/model_structure.png "The structure of a model.")
-> Usually, a model folder contains the expressions, textures, motions, sounds, and some other files. Some may have only one of expressions or motions. Make sure your model folder is consistent with the model json file. Here in this example, the model folder `Haru` and the model json file `Haru.model3.json` have the a `Haru` in them. Inconsistency of this would crash the app.
+> Usually, a model folder contains the expressions, textures, motions, sounds, and some other files. Some models may not have expressions or motions, but that won't be a problem for our app. Make sure your model folder is consistent with the model json file. Here in this example, the model folder `Haru` and the model json file `Haru.model3.json` are consistent because they both have `Haru`. Inconsistency would crash the app.
 
 Restart the app to load the imported model.
 
-## Pipeline<a name="pipeline"></a>
+## Build and Deploy<a name="build-and-deploy"></a>
 [Return to Table of Content](#table-of-content)
 
-![](screenshots/pipeline.jpg "The pipeline of the app.")
-> The input, should it be voice, will be converted to text by Azure. It is then combined to form the "messages" for OpenAI API format. The output from ChatGPT is in JSON format, containing three keys: "Expressions", "Motions", and "Content". The "Expressions" and "Motions" are used to animate the Live2D model, and the "Content" will be voiced by Azure and also stitched to the "messages". Loop until the user terminates the talk session. The chat history is temporarily saved and will be read if user restart the chat or talk session, unless the user resets the history or closes the app.
+(You don't need this if you just download the released app.) To build the project, there are two major steps. 
 
+#### Windows<a name="windows"></a>
+[Return to Table of Content](#table-of-content)
+
+First, locate the path of the `cmake.exe` in your Qt. For me, it is in `E:\Qt\Tools\CMake_64\bin\cmake.exe`. Edit `build_component.bat`, adjust Line 4 to
+
+```
+set CMAKE=path\to\your\cmake.exe
+```
+
+Launch `Git Bash` in the project root path, run the `build_component.bat` script in the Git Bash by
+
+```
+./build_component.bat
+```
+
+The batch script will download, build, and install OpenSSL, Curl, and OpenCV, and finally delete all unnecessary resources.
+
+
+Then, launch your Qt Creator, Open Project --> locate the project folder --> choose the `holoLive2dChatbot.pro` file to open. Click `Run` button on the bottom left. An executable `HoloBot.exe` will be generated (inside something like `build-HoloLive2dChatbot-Desktop_Qt_6_5_0_MSVC2019_64bit-Release`). And we are ready to deploy. 
+
+
+To deploy, first, ensure that `VCINSTALLDIR` is set in your [System Environment Variable](https://www.computerhope.com/issues/ch000549.htm). I set it to `D:\VisualStudio2019\VC` as I installed the VS to disk D. Then, locate the path of the `windeployqt.exe` in your Qt. For me, it is in `E:\Qt\6.5.0\msvc2019_64\bin\windeployqt.exe`. Make sure its version (6.5.0) is the same as your working Qt version. There could be multiple `windeployqt.exe` existed in your Qt. For me, I have another one of version `6.4.1` in `E:\Qt\Tools\QtDesignStudio\qt6_design_studio_reduced_version\bin` which is not compatible with my Qt 6.5.0. 
+
+Then, copy `HoloBot.exe` to an empty folder, lets call it `\HoloBot\HoloBot.exe`, in that folder, launch Git Bash, copy all the dependencies to this folder by
+
+```
+E:\Qt\6.5.0\msvc2019_64\bin\windeployqt.exe . --compiler-runtime
+``` 
+
+Make sure there is no error returned. The command will generate the following dependencies.
+
+![](screenshots/deploy.png "The generated dependencies.")
+> All except `HoloBot.exe` are automatically generated. Make sure `vc_redist_x64.exe` is there!
+
+
+Finally, manually copy the follows to `\HoloBot\`.
+
++ `libcurl.dll`
++ `Microsoft.CognitiveServices.Speech.core.dll`
++ `Microsoft.CognitiveServices.Speech.extension.audio.sys.dll`
++ `Microsoft.CognitiveServices.Speech.extension.codec.dll`
++ `opencv_core470.dll`, `opencv_highgui470.dll`, `opencv_imgcodecs470.dll`, `opencv_imgproc470.dll`
++ `Resources` folder (don't forget this!)
+
+
+Now `\HoloBot` is a standalone package for the app!!
+
+
+#### Linux<a name="linux"></a>
+[Return to Table of Content](#table-of-content)
+
+To do...
 
 ## End Note<a name="end-note"></a>
 [Return to Table of Content](#table-of-content)
