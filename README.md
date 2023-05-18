@@ -64,7 +64,7 @@ Some optional requirements include a Raspberry PI or Nvidia Jetson to make thing
 
 If you would like to amend and build the project:
 
-+ [Windows 10/11](https://www.microsoft.com/software-download/windows11) + [MSVC compiler](https://visualstudio.microsoft.com/vs/older-downloads/#visual-studio-2019-and-other-products) or [Ubuntu20/22](https://ubuntu.com/download/desktop) + [GCC compiler](https://linuxize.com/post/how-to-install-gcc-on-ubuntu-20-04/). Note that Windows + Mingw and Windows + GCC are not compatible. Note that When install the Visual Studio, tick "Desktop Development with C++".
++ [Windows 10/11](https://www.microsoft.com/software-download/windows11) + [MSVC compiler](https://visualstudio.microsoft.com/vs/older-downloads/#visual-studio-2019-and-other-products) or [Ubuntu20/22](https://ubuntu.com/download/desktop) + [GCC compiler](https://linuxize.com/post/how-to-install-gcc-on-ubuntu-20-04/). Note that Windows + Mingw and Windows + GCC are not compatible. And when install the Visual Studio, tick "Desktop Development with C++".
 + [Qt Creator](https://github.com/qt-creator/qt-creator), which is an IDE specifically for Qt. Install this will also install all necessary Qt libraries.
 + [Git Bash](https://git-scm.com/download/win) (Windows only), we will use it to run the bat script on Windows. When install, simply click Next, no need to change the default setting except for the installation path.
 
@@ -141,7 +141,7 @@ Suppose you already have the hologram pyramid, there are several ways to display
 	+ Cons
 		+ The LED screen may not as light and thin as iPad is.
 		+ Cables for LED's power and display (HDMI) are annoying.		
-3. You have a Raspberry PI or Nvidia Jetson, on which placed embedded a small screen.
+3. You have a Raspberry PI or Nvidia Jetson, on which embedded a small screen.
 	+ Pros
 		+ Highly portable, especially if you also use wireless microphone.
 	+ Cons
@@ -161,14 +161,14 @@ Suppose you already have the hologram pyramid, there are several ways to display
 Before import a new model, you need to do the follows.
 
 + Download a model from the [official collection](https://www.live2d.com/en/download/sample-data/) or any 3rd party sources. Make sure there is a `xxx.model3.json` in it, not a `xxx.model.json`. The latter only supports  Live2D SDK version <3.0 (I guess), whereas the app is based on the newest (4.2.4) Live2D SDK.
-+ Edit `xxx.model3.json` for your model. The goal is to name each expressions and motions meaningfully so that later ChatGPT can react based on them. In some models, the expressions or motions may have meaningless name such as `F01`, `F02`, etc. Change it to meaningful name such as `Happy`, `Sad`. 
++ Edit `xxx.model3.json` for your model. The goal is to name each expressions and motions meaningfully so that later ChatGPT can react based on them. In some models, the expressions or motions may have meaningless names such as `F01`, `F02`, etc. Change it to meaningful names such as `Happy`, `Sad`. 
 	+ How to determine the correct name? Go to an Live2D online viewer like [this one](https://guansss.github.io/live2d-viewer-web/), drag your model folder to it and play each expression and/or motion. By which you should be able to eyeball and name them. Make them distinguishable to each other. For example, for expressions, there are several [basic emotions](https://en.wikipedia.org/wiki/Emotion) to name, including `Happy`, `Sad`, `Disgusting`, `Fear`, `Angry`, `Neutral`, `Surprised`, and `Contempt`, and for motions, consider `Smile`, `Cry`, `Laugh`, `Doubt`, `Jump`, etc... Restructure the json if necessary. See the existing model json files (such as `Resources/Wanko_touch/Wanko_touch.model3.json` and `Resources/Haru/Haru.model3.json`) for reference.
 + If the model's predefined expressions and motions do not satisfy you, you can use [Live2D Editor](https://www.live2d.com/en/) to create more. I am very new to this but there are plenty of tutorials online. Alternatively, you may pay someone to create a custom model for you.
 
 To import more models, simply copy/paste the model folder under `Resources` folder. The model folder structure looks like this.
 
 ![](screenshots/model_structure.png "The structure of a model.")
-> Usually, a model folder contains the expressions, textures, motions, sounds, and some other files. Some models may not have expressions or motions, but that won't be a problem for our app. Make sure your model folder is consistent with the model json file. Here in this example, the model folder `Haru` and the model json file `Haru.model3.json` are consistent because they both have `Haru`. Inconsistency would crash the app.
+> Usually, a model folder contains the expressions, textures, motions, sounds, and some other files. Some models may not have expressions or motions, but that won't be a problem for our app. Make sure your model folder is consistent with the model json file. Here in this example, the model folder `Haru` and the model json file `Haru.model3.json` are consistent because they both have `Haru`. Inconsistency would crash the app. The last `prompt_default.txt` will be generated if it doesn't exist.
 
 Restart the app to load the imported model.
 
@@ -212,7 +212,7 @@ Make sure there is no error returned. The command will generate the following de
 > All except `HoloBot.exe` are automatically generated. Make sure `vc_redist_x64.exe` is there!
 
 
-Finally, manually copy the follows to `\HoloBot\`.
+Finally, manually copy the follows from the source code to `\HoloBot\`.
 
 + `libcurl.dll`
 + `Microsoft.CognitiveServices.Speech.core.dll`
@@ -233,9 +233,9 @@ To do...
 ## End Note<a name="end-note"></a>
 [Return to Table of Content](#table-of-content)
 
-Thanks [duanxianpi](https://github.com/duanxianpi/QtLive2d) for creating the QtLive2D Widget and his timely support. Thanks [ChatGPT](https://chat.openai.com/) for the super helpful guidance on each technical problems. Frankly speaking I know nothing about C++ and Qt. It is ChatGPT who helped me realize this app. (No, I write this ReadMe by myself :)
+Thanks @duanxianpi for creating the QtLive2D Widget and his timely support. Thanks [ChatGPT](https://chat.openai.com/) for the super helpful guidance on every trivial/critical technical problems. Frankly speaking I know nothing about C++ and Qt. It is ChatGPT who helped me realize this app.
 
-Please excuse any inappropriate C++ coding and English writing from my inexperience.
+Please excuse any inappropriate C++ coding and English writing.
 
 
 
