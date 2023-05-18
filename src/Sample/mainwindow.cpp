@@ -340,6 +340,10 @@ void MainWindow::restart()
 void MainWindow::HoloDisplay()
 {
 
+    hide();
+    setAttribute(Qt::WA_TranslucentBackground, 0);
+    show();
+
     toolBar->hide();
 
     qLive2dWidget->resize(modelSize);
@@ -347,6 +351,7 @@ void MainWindow::HoloDisplay()
     chatWidget->hide();
 
     holoWidget->show();
+
 
     QRect rect = QGuiApplication::primaryScreen()->geometry();
     holoWidget->setGeometry(rect);
@@ -368,6 +373,9 @@ void MainWindow::HoloDisplay()
     }
 
     widgetModeAction->setChecked(true);
+    hide();
+    setAttribute(Qt::WA_TranslucentBackground, 1);
+    show();
 }
 
 
