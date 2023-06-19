@@ -1,6 +1,6 @@
 #include <QJsonDocument>
 #include <QThread>
-
+#include <QMessageBox>
 #include "OpenAI/openai.hpp"
 #include "communicate.h"
 
@@ -8,36 +8,50 @@ using namespace Microsoft::CognitiveServices::Speech;
 using namespace Microsoft::CognitiveServices::Speech::Audio;
 
 Mailman::Mailman(ChatWidget *chatWidget) : m_chatWidget(chatWidget) {
+    // Save the chat history to Qt Standard model.
     connect(this, SIGNAL(updateChatModel(nlohmann::json,QString)), m_chatWidget, SLOT(update(nlohmann::json,QString)));
 }
 
 
 void Mailman::talk(QString prompts, QString azureSetting) {
+
+    // Get the current prompts.
     static QRegularExpression fingNewLineChar("[\\n]");
     std::string cleanprompt = prompts.remove(fingNewLineChar).toStdString();
 
+    // Format the prompts following OPENAI's standard.
     jsonBody = initJsonBody(cleanprompt);
 
+    // Read the variables from System Setting.
     auto speechKey = GetEnvironmentVariable("SPEECH_KEY");
     auto speechRegion = GetEnvironmentVariable("SPEECH_REGION");
 
+    // If the variable is not set, then quit the thread.
     if ((std::size(speechKey) == 0) || (std::size(speechRegion) == 0)) {
         std::cout << "Please set both SPEECH_KEY and SPEECH_REGION environment variables." << std::endl;
-    }
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Error");
+        msgBox.setText("Cannot find SPEECH_KEY and SPEECH_REGION environment variables. Check your system environment variable setting!");
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.addButton("OK", QMessageBox::AcceptRole);
 
+        QThread::currentThread()->quit();
+        QThread::currentThread()->wait();
+    }
     auto speechConfig = SpeechConfig::FromSubscription(speechKey, speechRegion);
 
+    // Get the preferred voice.
     QString language = azureSetting.split("-")[0] + "-" + azureSetting.split("-")[1];
     QString voice = azureSetting;
     speechConfig->SetSpeechRecognitionLanguage(language.toStdString());
     speechConfig->SetSpeechSynthesisVoiceName(voice.toStdString());
 
-
+    // Initialize streaming...
     auto audioConfig = AudioConfig::FromDefaultMicrophoneInput();
     auto recognizer = SpeechRecognizer::FromConfig(speechConfig, audioConfig);
     auto speechSynthesizer = SpeechSynthesizer::FromConfig(speechConfig);
 
-
+    // Start streaming...
     while (!QThread::currentThread()->isInterruptionRequested())
     {
         auto voiceInput = recognizer->RecognizeOnceAsync().get();
@@ -49,21 +63,29 @@ void Mailman::talk(QString prompts, QString azureSetting) {
 
             nlohmann::json userInputJson;
 
-            // Add key-value pairs to the JSON object
+            // The json contains Expression and Motion to animate the Live2D model and Content for conversation.
             userInputJson["Expression"] = "";
             userInputJson["Motion"] = "";
             userInputJson["Content"] = userInput;
+
+            // Save the json to Qt StandardItemModel. So that the chat bubble can be filled in with words.
             emit updateChatModel(userInputJson, "Outgoing");
 
+            // Format the user input following OpenAI's standard.
             nlohmann::json userMessage = getNewMessage("user", userInput);
+
+            // Stitch it with the main json.
             jsonBody = insertMessage(jsonBody, userMessage);
 
+            // Send POST request to OpenAI.
             openai::start();
             nlohmann::json completion = openai::chat().create(jsonBody);
 
+            // Get the response from OpenAI. Always use the top-1 response.
             std::string gptResponse = completion["choices"][0]["message"]["content"];
-            nlohmann::json gptResponseJson = parseJsonString(gptResponse);
 
+            // Parse the returned data as if it is json. Sometime the data may not be json, so we manually make sure it is.
+            nlohmann::json gptResponseJson = parseJsonString(gptResponse);
             expression = gptResponseJson.contains("Expression") ? gptResponseJson["Expression"] : "";
             motion = gptResponseJson.contains("Motion") ? gptResponseJson["Motion"] : "";
             content = gptResponseJson.contains("Content") ? gptResponseJson["Content"].get<std::string>() : gptResponse;
@@ -73,16 +95,21 @@ void Mailman::talk(QString prompts, QString azureSetting) {
             reconstructedJson["Motion"] = motion;
             reconstructedJson["Content"] = content;
 
+            // Send the expression and motion to animate the Live2D model.
             emit sendResponseMove(expression, motion);
+
+            // Save the json to Qt StandardItemModel.
             emit updateChatModel(reconstructedJson, "Incoming");
 
+            // Stitch the json with the main json.
             nlohmann::json gptMessage = getNewMessage("assistant", reconstructedJson.dump());
             jsonBody = insertMessage(jsonBody, gptMessage);
 
+            // Voice the reply.
             auto chatGptVoiceOutput = speechSynthesizer->SpeakTextAsync(content).get();}
        }
 
-
+    // Stop the thread.
     QThread::currentThread()->quit();
     QThread::currentThread()->wait();
 }
@@ -99,6 +126,7 @@ nlohmann::json Mailman::getNewMessage(std::string role, std::string content)
 }
 
 void Mailman::chat(QString prompts, QString userInput) {
+    // This member is largely the same as talk(), but it is only a one-turn process and has no while loop.
     static QRegularExpression fingNewLineChar("[\\n]");
     std::string cleanprompt = prompts.remove(fingNewLineChar).toStdString();
 
@@ -141,6 +169,7 @@ void Mailman::chat(QString prompts, QString userInput) {
 
 nlohmann::json Mailman::insertMessage(nlohmann::json json, nlohmann::json newJson)
 {
+    // Stitch the reply from ChatGPT so that it can track the context. Without stitching, the prompt will be forgotten in no time.
     if (newJson.size())
     {
              if(newJson.is_array())

@@ -12,6 +12,7 @@
 #include <QToolBar>
 #include <QStandardItemModel>
 #include <QListView>
+#include <QDebug>
 #include "listviewdelegate.h"
 #include "editdialog.h"
 
@@ -129,7 +130,7 @@ void MainWindow::getPrompt(QString prompt)
 void MainWindow::chat(QString userInput)
 {
     talkThread->start();
-    emit sendPromptsAndChatInput(currentPrompt, userInput);
+    emit sendPromptsAndChatInput(currentPrompt, userInput);  
 }
 
 
@@ -204,6 +205,7 @@ void MainWindow::createActions()
         holoWidget->hide();
         qLive2dWidget->show();
         chatWidget->show();
+        chatWidget->textEdit->setFocus();
     });
 
 
@@ -377,9 +379,8 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         chatWidget->hide();
         move(screenSize.width() - width(), screenSize.height() - height());
     }
-    else
+else
     {
-        // handle other key press events
         QWidget::keyPressEvent(event); // let the base class handle the event
     }
 }

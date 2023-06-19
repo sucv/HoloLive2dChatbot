@@ -1,18 +1,41 @@
 #include "listviewdelegate.h"
 
+// Use this custom QTextEdit class to capture the Enter key and shift enter key.
+// It improves the keyboard-based chat experience a lot.
+ChatTextEdit::ChatTextEdit(QWidget *parent) : QTextEdit(parent){}
+
+void ChatTextEdit::keyPressEvent(QKeyEvent* event)
+{
+    if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
+    {
+        if (event->modifiers() == Qt::ShiftModifier)
+        {
+            // Shift+Enter pressed, handle custom behavior here
+            // For example, add a new line without emitting the enterKeyPressed() signal
+            QTextEdit::keyPressEvent(event); // Let the base class handle the key event
+        }
+        else
+        {
+            // Enter pressed, emit the enterKeyPressed() signal
+            emit enterKeyPressed();
+            setFocus();
+        }
+    }
+    else
+    {
+        QTextEdit::keyPressEvent(event); // Let the base class handle the key event
+    }
+}
+
+
 ChatWidget::ChatWidget(QWidget* parent) : QWidget(parent) {
     listView = new QListView();
-//    listView->setStyleSheet("border: none");
     chatModel = new QStandardItemModel();
-    textEdit = new QTextEdit();
-//    textEdit->setStyleSheet("border: none");
-//    textEdit->setMaximumSize(200,450);
-    pushButton = new QPushButton(tr("Send"));
-    pushButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    connect(pushButton, &QPushButton::clicked, this, &ChatWidget::send);
+    textEdit = new ChatTextEdit();
+//    connect(textEdit, &ChatTextEdit::enterKeyPressed, pushButton, &QPushButton::click);
+    connect(textEdit, &ChatTextEdit::enterKeyPressed, this, &ChatWidget::send);
 
     listView->setModel(chatModel);
-
 
     // create a view and set our data
     listView->setResizeMode(QListView::Adjust);
@@ -29,14 +52,7 @@ ChatWidget::ChatWidget(QWidget* parent) : QWidget(parent) {
 
     QVBoxLayout* layout = new QVBoxLayout();
     layout->addWidget(listView);
-//    layout->addWidget(separator);
     layout->addWidget(textEdit);
-
-    auto buttonLayout = new QHBoxLayout();
-    buttonLayout->addStretch();
-    buttonLayout->addWidget(pushButton);
-    layout->addLayout(buttonLayout);
-
     setLayout(layout);
     connect(chatModel, &QStandardItemModel::rowsInserted, listView, &QListView::scrollToBottom);
 }
@@ -72,8 +88,8 @@ void ChatWidget::send()
     if (userInput != "")
     {
         emit sendUserInput(userInput);
+        textEdit->setFocus();
     }
-
 }
 
 void ChatWidget::update(nlohmann::json input, QString role)

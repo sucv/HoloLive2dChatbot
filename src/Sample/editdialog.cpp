@@ -17,19 +17,19 @@ using namespace LAppDefine;
 EditDialog::EditDialog(MainWindow *mainWindow, QWidget *parent)
     : QDialog(parent), m_mainWindow(mainWindow)
 {
+    // The combobox for live2d models, prompt files, and available voices.
     modelComboBox = new QComboBox(this);
+    promptComboBox = new QComboBox(modelComboBox);
+    languageComboBox = new QComboBox(this);
+
     connect(modelComboBox, &QComboBox::activated, m_mainWindow, &MainWindow::loadModel);
     connect(this, &EditDialog::sendPrompt, m_mainWindow, &MainWindow::getPrompt);
-    promptComboBox = new QComboBox(modelComboBox);
     connect(modelComboBox, SIGNAL(currentIndexChanged(int)), m_mainWindow, SLOT(updateModelIndex(int)));
     connect(modelComboBox, SIGNAL(currentIndexChanged(int)), promptComboBox, SLOT(clear()));
     connect(modelComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(populateComboBox()));
-
     connect(promptComboBox, &QComboBox::activated, this, &EditDialog::loadPrompts);
-
-    languageComboBox = new QComboBox(this);
-
     connect(languageComboBox, &QComboBox::currentTextChanged, m_mainWindow, &MainWindow::updateVoiceLanguage);
+
     initAzureSetting();
 
     modelLabel = new QLabel(tr("&Model"));
@@ -64,12 +64,14 @@ EditDialog::EditDialog(MainWindow *mainWindow, QWidget *parent)
             }
         }
 
+        // Send the updated prompt to mainwindow.
         emit sendPrompt(promptTextEdit->toPlainText());
         promptComboBox->clear();
         populateComboBox();
 
         this->accept(); // Accept the dialog
     });
+
     connect(buttonBox, &QDialogButtonBox::rejected, this, [&](){
         loadPrompts(0);
         this->reject();
@@ -173,7 +175,7 @@ void EditDialog::populateComboBox()
         promptComboBox->addItem(txtFiles[i]);
     }
     loadPrompts(0);
-    qDebug() << promptTextEdit->toPlainText() << "prompt";
+
     emit sendPrompt(promptTextEdit->toPlainText());
 }
 
@@ -204,9 +206,9 @@ void EditDialog::loadPrompts(int promptIndex)
 
 void EditDialog::initPrompts(int modelIndex)
 {
-
+    // Initialize the prompt by reading the model json of Live2D model.
+    // The initialized prompt is expected to be further modified manually to better behave as intended.
     QJsonObject jsonObject, motions, expressions;
-
     QList<QString> expressionList, motionList, rules;
 
 

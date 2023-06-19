@@ -55,7 +55,7 @@ inline void ListViewDelegate::paint(QPainter * painter, QStyleOptionViewItem
     QTextOption textOption(bodydoc.defaultTextOption());
     textOption.setWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
     bodydoc.setDefaultTextOption(textOption);
-    bodydoc.setDefaultFont(QFont("Roboto", 12));
+    bodydoc.setDefaultFont(QFont("Arial", 12));
     //  QString bodytext(index.data(Qt::DisplayRole).toString());
 
     nlohmann::json bodyTextJson = nlohmann::json::parse(index.data(Qt::DisplayRole).toString().toStdString());
@@ -168,13 +168,27 @@ inline QSize ListViewDelegate::sizeHint(QStyleOptionViewItem
     return size;
 }
 
+class ChatTextEdit : public QTextEdit
+{
+    Q_OBJECT
+
+public:
+    explicit ChatTextEdit(QWidget *parent = nullptr);
+
+signals:
+    void enterKeyPressed();
+
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
+};
+
 class ChatWidget: public QWidget {
     Q_OBJECT
 
 public:
     ChatWidget(QWidget * parent = nullptr);
     QStandardItemModel * chatModel;
-    QTextEdit * textEdit;
+    ChatTextEdit * textEdit;
 
     nlohmann::json itemToJsonArray();
 
