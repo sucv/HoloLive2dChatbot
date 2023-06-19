@@ -27,6 +27,7 @@ public:
     QLive2dWidget *qLive2dWidget;
     QLabel *holoWidget;
     ChatWidget *chatWidget;
+    QWidget *toolbarPlaceholder;
 
     int getModelIndex() const { return index; };
 
@@ -39,13 +40,14 @@ public:
     QString currentVoiceLanguage;
 
 
-    virtual void enterEvent(QEnterEvent * event) override;
-    virtual void leaveEvent(QEvent * event) override;
+//    virtual void enterEvent(QEnterEvent * event) override;
+//    virtual void leaveEvent(QEvent * event) override;
 
 public slots:
     void chat(QString userInput);
     void updateModelIndex(int);
     void updateVoiceLanguage(QString);
+    void getPrompt(QString);
 
 
 private:
@@ -54,7 +56,7 @@ private:
     QSize modelSize;
 
 
-    QToolBar *toolBar;
+//    QToolBar *toolBar;
 
     QMenu *contextMenu;
     QAction *settingAction, *holoModeAction, *chatModeAction, *widgetModeAction, *talkAction, *closeAction, *restartAction, *helpAction;
@@ -81,7 +83,6 @@ private:
 
 
 private slots:
-    void getPrompt(QString);
     void HoloDisplay();
     void restart();
 

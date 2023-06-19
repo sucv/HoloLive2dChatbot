@@ -15,11 +15,6 @@
 #include "listviewdelegate.h"
 #include "editdialog.h"
 
-//#ifdef WIN32
-//#include <QtGui/QWindow>
-//#include <Windows.h>
-//#endif
-
 using namespace LAppDefine;
 
 MainWindow::MainWindow(QWidget *parent)
@@ -28,11 +23,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     setWindowTitle(QCoreApplication::applicationName());
 
+    //    Set the size for the model.
     screenSize = qApp->primaryScreen()->size();
     modelSize = QSize(screenSize.height() / 2.15, screenSize.height() / 2.15);
     resize(modelSize);
     setMinimumSize(modelSize / 2);
 
+    //    Create the three widgets, the qLive2dWidget, holoWidget, and chatWidget.
+    //    And also the layout.
     centralwidget = new QWidget(this);
     centralwidget->setObjectName("centralwidget");
 
@@ -45,17 +43,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     holoWidget = new QLabel();
     holoWidget->setObjectName("holoWidget");
-//    holoWidget->setStyleSheet("background-color: black;");
 
     holoWidget->hide();
-
 
     QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     sizePolicy.setHeightForWidth(centralwidget->sizePolicy().hasHeightForWidth());
 
     qLive2dWidget->setSizePolicy(sizePolicy);
     holoWidget->setSizePolicy(sizePolicy);
-
 
     horizontalLayout->addWidget(qLive2dWidget);
     horizontalLayout->addWidget(holoWidget);
@@ -66,10 +61,11 @@ MainWindow::MainWindow(QWidget *parent)
     chatWidget->hide();
     setCentralWidget(centralwidget);
 
+    //    Create a new thread, and put the communication with Azure/OpenAI API to it.
     mailman = new Mailman(chatWidget);
     talkThread = new QThread(this);
 
-    // Move worker to thread
+    // Move worker to thread.
     mailman->moveToThread(talkThread);
 
     connect(this, &MainWindow::sendCurrentPromptsAndVoiceLanguage, mailman, &Mailman::talk);
@@ -77,6 +73,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, &MainWindow::sendPromptsAndChatInput, mailman, &Mailman::chat);
     connect(mailman, &Mailman::sendResponseMove, qLive2dWidget, &QLive2dWidget::react);
 
+    //    Create all the actions.
     createActions();
     createContextActions();
 
@@ -86,24 +83,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(editDialog, &EditDialog::sendPrompt, this, &MainWindow::getPrompt);
     editDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 
-
-
-/*
-Transparent the window
-*/
-
+    //    Transparent the window
     setAttribute(Qt::WA_TranslucentBackground);
     setWindowFlags(Qt::WindowStaysOnTopHint);
     setWindowFlag(Qt::FramelessWindowHint);
 
-
-/*
-Transparent to messages (click, touch, keyboard). If you set this, whole windows will be Transparent to messages.
-*/
-
-//    this->setAttribute(Qt::WA_TransparentForMouseEvents);
-//    SetForegroundWindow((HWND)winId());
-//    this->setWindowFlags(Qt::Window |Qt::WindowStaysOnTopHint);
 }
 
 MainWindow::~MainWindow()
@@ -180,21 +164,21 @@ void MainWindow::openSettings()
 
 void MainWindow::createActions()
 {
-    toolBar = addToolBar(tr("Actions"));
+//    toolBar = addToolBar(tr("Actions"));
 
     closeAction = new QAction(QIcon(rsrcPath + "/switch.png"),  tr("&Exit"), this);
     connect(closeAction, &QAction::triggered, this, &MainWindow::close);
-    toolBar->addAction(closeAction);
+//    toolBar->addAction(closeAction);
 
 
     restartAction = new QAction(QIcon(rsrcPath + "/restart.png"),  tr("&Clear Histroy"), this);
     connect(restartAction, &QAction::triggered, this, &MainWindow::restart);
-    toolBar->addAction(restartAction);
+//    toolBar->addAction(restartAction);
 
 //    toolBar->addSeparator();
 
 
-    viewActionGroup = new QActionGroup(toolBar);
+    viewActionGroup = new QActionGroup(this);
     viewActionGroup->setExclusive(true);
 
 
@@ -211,7 +195,7 @@ void MainWindow::createActions()
 
     widgetModeAction->setCheckable(true);
     widgetModeAction->setChecked(true);
-    toolBar->addAction(widgetModeAction);
+//    toolBar->addAction(widgetModeAction);
 
     chatModeAction = new QAction(QIcon(rsrcPath + "/chat.png"), tr("&Chat Mode"), this);
     connect(chatModeAction, &QAction::triggered, this, [&](){
@@ -224,7 +208,7 @@ void MainWindow::createActions()
 
 
     chatModeAction->setCheckable(true);
-    toolBar->addAction(chatModeAction);
+//    toolBar->addAction(chatModeAction);
 
 
     holoModeAction = new QAction(QIcon(rsrcPath + "/hologram.png"),  tr("&Holo Mode"), this);
@@ -233,7 +217,7 @@ void MainWindow::createActions()
     });
 
     holoModeAction->setCheckable(true);
-    toolBar->addAction(holoModeAction);
+//    toolBar->addAction(holoModeAction);
 
     viewActionGroup->addAction(widgetModeAction);
     viewActionGroup->addAction(chatModeAction);
@@ -245,7 +229,7 @@ void MainWindow::createActions()
     talkAction = new QAction(QIcon(rsrcPath + "/microphone.png"),  tr("&Talk"), this);
     connect(talkAction, &QAction::triggered, this, &MainWindow::toggleTalking);
     talkAction->setCheckable(true);
-    toolBar->addAction(talkAction);
+//    toolBar->addAction(talkAction);
 
 //    toolBar->addSeparator();
 
@@ -254,8 +238,8 @@ void MainWindow::createActions()
         openSettings();
     });
 
-    toolBar->addAction(settingAction);
-    helpAction = new QAction(QIcon(rsrcPath + "/help.png"), tr("Settings"), this);
+//    toolBar->addAction(settingAction);
+    helpAction = new QAction(QIcon(rsrcPath + "/help.png"), tr("Help"), this);
     connect(helpAction, &QAction::triggered, this, [&](){
         // Create the message box
         QMessageBox msgBox(this);
@@ -306,24 +290,28 @@ void MainWindow::createActions()
         msgBox.exec();
     });
 
-    toolBar->addAction(helpAction);
+//    toolBar->addAction(helpAction);
 //    toolBar->addSeparator();
 
-    toolBar->hide();
-    toolBar->setStyleSheet("QToolBar { border-top: 0px; border-bottom: 0px; }");
+//    toolBar->hide();
+//    toolBar->setStyleSheet("QToolBar { border-top: 0px; border-bottom: 0px; }");
 
 }
 
 void MainWindow::createContextActions()
 {
     contextMenu = new QMenu(this);
+    contextMenu->addAction(closeAction);
+    contextMenu->addAction(restartAction);
     contextMenu->addSeparator();
     contextMenu->addAction(widgetModeAction);
     contextMenu->addAction(chatModeAction);
     contextMenu->addAction(holoModeAction);
     contextMenu->addSeparator();
     contextMenu->addAction(talkAction);
-    contextMenu->addAction(closeAction);
+    contextMenu->addAction(settingAction);
+    contextMenu->addAction(helpAction);
+
 
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, &QWidget::customContextMenuRequested, this, [=](const QPoint &pos) {
@@ -344,7 +332,7 @@ void MainWindow::HoloDisplay()
     setAttribute(Qt::WA_TranslucentBackground, 0);
     show();
 
-    toolBar->hide();
+//    toolBar->hide();
 
     qLive2dWidget->resize(modelSize);
     qLive2dWidget->hide();
@@ -397,20 +385,20 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 }
 
 
-void MainWindow::enterEvent(QEnterEvent* event)
-{
-    // Show the toolbar when the mouse enters the window
+//void MainWindow::enterEvent(QEnterEvent* event)
+//{
+//    // Show the toolbar when the mouse enters the window
 
-    if (!holoWidget->isVisible())
-    {
-        toolBar->show();
-    }
-    QMainWindow::enterEvent(event);
-}
+//    if (!holoWidget->isVisible())
+//    {
+////        toolBar->show();
+//    }
+//    QMainWindow::enterEvent(event);
+//}
 
-void MainWindow::leaveEvent(QEvent* event)
-{
-    // Hide the toolbar when the mouse leaves the window
-    toolBar->hide();
-    QMainWindow::leaveEvent(event);
-}
+//void MainWindow::leaveEvent(QEvent* event)
+//{
+//    // Hide the toolbar when the mouse leaves the window
+////    toolBar->hide();
+//    QMainWindow::leaveEvent(event);
+//}

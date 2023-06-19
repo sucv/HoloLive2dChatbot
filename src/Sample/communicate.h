@@ -25,6 +25,7 @@ private:
     nlohmann::json getNewMessage(std::string, std::string);
     nlohmann::json initJsonBody(std::string);
     nlohmann::json insertMessage(nlohmann::json, nlohmann::json);
+    nlohmann::json parseJsonString(const std::string& inputString);
     bool isChatting = false;
 
 public slots:

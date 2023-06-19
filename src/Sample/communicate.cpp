@@ -62,17 +62,23 @@ void Mailman::talk(QString prompts, QString azureSetting) {
             nlohmann::json completion = openai::chat().create(jsonBody);
 
             std::string gptResponse = completion["choices"][0]["message"]["content"];
-            nlohmann::json gptResponseJson = nlohmann::json::parse(gptResponse);
+            nlohmann::json gptResponseJson = parseJsonString(gptResponse);
 
             expression = gptResponseJson.contains("Expression") ? gptResponseJson["Expression"] : "";
             motion = gptResponseJson.contains("Motion") ? gptResponseJson["Motion"] : "";
-            content = gptResponseJson.contains("Content") ? gptResponseJson["Content"] : "";
+            content = gptResponseJson.contains("Content") ? gptResponseJson["Content"].get<std::string>() : gptResponse;
+
+            nlohmann::json reconstructedJson;
+            reconstructedJson["Expression"] = expression;
+            reconstructedJson["Motion"] = motion;
+            reconstructedJson["Content"] = content;
 
             emit sendResponseMove(expression, motion);
-            emit updateChatModel(gptResponseJson, "Incoming");
+            emit updateChatModel(reconstructedJson, "Incoming");
 
-            nlohmann::json gptMessage = getNewMessage("assistant", gptResponse);
+            nlohmann::json gptMessage = getNewMessage("assistant", reconstructedJson.dump());
             jsonBody = insertMessage(jsonBody, gptMessage);
+
             auto chatGptVoiceOutput = speechSynthesizer->SpeakTextAsync(content).get();}
        }
 
@@ -113,19 +119,23 @@ void Mailman::chat(QString prompts, QString userInput) {
     nlohmann::json completion = openai::chat().create(jsonBody);
 
     std::string gptResponse = completion["choices"][0]["message"]["content"];
-    nlohmann::json gptResponseJson = nlohmann::json::parse(gptResponse);
+    nlohmann::json gptResponseJson = parseJsonString(gptResponse);
 
     expression = gptResponseJson.contains("Expression") ? gptResponseJson["Expression"] : "";
     motion = gptResponseJson.contains("Motion") ? gptResponseJson["Motion"] : "";
-    content = gptResponseJson.contains("Content") ? gptResponseJson["Content"] : "";
+    content = gptResponseJson.contains("Content") ? gptResponseJson["Content"].get<std::string>() : gptResponse;
 
-
+    nlohmann::json reconstructedJson;
+    reconstructedJson["Expression"] = expression;
+    reconstructedJson["Motion"] = motion;
+    reconstructedJson["Content"] = content;
 
     emit sendResponseMove(expression, motion);
-    emit updateChatModel(gptResponseJson, "Incoming");
+    emit updateChatModel(reconstructedJson, "Incoming");
 
-    nlohmann::json gptMessage = getNewMessage("assistant", gptResponse);
+    nlohmann::json gptMessage = getNewMessage("assistant", reconstructedJson.dump());
     jsonBody = insertMessage(jsonBody, gptMessage);
+
 }
 
 
@@ -151,9 +161,9 @@ nlohmann::json Mailman::initJsonBody(std::string prompts)
 
     nlohmann::json requestJson =
         {
-            {"model", "gpt-3.5-turbo"},
+            {"model", "gpt-3.5-turbo-0613"},
             {"max_tokens", 2000},
-            {"temperature", 0.5},
+            {"temperature", 0.7},
             {"messages", nlohmann::json::array()},
     };
 
@@ -163,6 +173,17 @@ nlohmann::json Mailman::initJsonBody(std::string prompts)
     return requestJson;
 }
 
+
+nlohmann::json Mailman::parseJsonString(const std::string& inputString) {
+    try {
+             nlohmann::json parsedJson = nlohmann::json::parse(inputString);
+             return parsedJson;
+    }
+    catch (const nlohmann::json::parse_error&) {
+             // If parsing fails, return an empty JSON object
+             return nlohmann::json();
+    }
+}
 
 std::string GetEnvironmentVariable(const char* name)
 {
@@ -181,3 +202,4 @@ std::string GetEnvironmentVariable(const char* name)
         return value ? value : "";
     #endif
 }
+

@@ -9,6 +9,7 @@
 #include <QFileDialog>
 #include <QDir>
 #include <QSettings>
+#include <QDebug>
 #include "mainwindow.h"
 
 using namespace LAppDefine;
@@ -18,7 +19,7 @@ EditDialog::EditDialog(MainWindow *mainWindow, QWidget *parent)
 {
     modelComboBox = new QComboBox(this);
     connect(modelComboBox, &QComboBox::activated, m_mainWindow, &MainWindow::loadModel);
-
+    connect(this, &EditDialog::sendPrompt, m_mainWindow, &MainWindow::getPrompt);
     promptComboBox = new QComboBox(modelComboBox);
     connect(modelComboBox, SIGNAL(currentIndexChanged(int)), m_mainWindow, SLOT(updateModelIndex(int)));
     connect(modelComboBox, SIGNAL(currentIndexChanged(int)), promptComboBox, SLOT(clear()));
@@ -172,6 +173,8 @@ void EditDialog::populateComboBox()
         promptComboBox->addItem(txtFiles[i]);
     }
     loadPrompts(0);
+    qDebug() << promptTextEdit->toPlainText() << "prompt";
+    emit sendPrompt(promptTextEdit->toPlainText());
 }
 
 QString EditDialog::parsePrompt(QString txtFileName)
@@ -288,7 +291,7 @@ void EditDialog::initPrompts(int modelIndex)
     }
     rules.append(str);
 
-    str = "In Content, you must use Chinese.\n";
+    str = "In Content, you must use English.\n";
     rules.append(str);
 
     QString defaultPrompt = rules.join("\n");
