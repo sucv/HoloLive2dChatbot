@@ -46,28 +46,15 @@ EditDialog::EditDialog(MainWindow *mainWindow, QWidget *parent)
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, &QDialogButtonBox::accepted, this, [&]() {
         if (promptTextEdit->document()->isModified()) { // If there are changes in the text
-
-            QMessageBox::StandardButton reply = QMessageBox::question(this, "Save changes?", "Do you want to save the changes to a new text file?",
-                                                                      QMessageBox::Yes | QMessageBox::No);
-            if (reply == QMessageBox::Yes) { // If the user wants to save the changes
-                // Save the text to a new file
-                QString modelPath = m_mainWindow->getModelPath();
-                QString fileName = QFileDialog::getSaveFileName(this, "Save Text File",  modelPath, "Text files (*.txt)");
-                if (!fileName.isEmpty()) { // If the user has selected a valid file name
-                    QFile file(fileName);
-                    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-                        QTextStream stream(&file);
-                        stream << promptTextEdit->toPlainText();
-                        file.close();
-                    }
-                }
-            }
+            saveNewPrompts();
+//            promptComboBox->clear();
+//            populateComboBox();
         }
 
         // Send the updated prompt to mainwindow.
+        promptIndex = promptComboBox->currentIndex();
         emit sendPrompt(promptTextEdit->toPlainText());
-        promptComboBox->clear();
-        populateComboBox();
+
 
         this->accept(); // Accept the dialog
     });
@@ -101,6 +88,49 @@ EditDialog::EditDialog(MainWindow *mainWindow, QWidget *parent)
         modelComboBox->addItem(modelName);
     }
     modelComboBox->setCurrentIndex(0);
+}
+
+void EditDialog::saveNewPrompts(){
+    QMessageBox::StandardButton reply = QMessageBox::question(this, "Save changes?", "Do you want to save the changes to a new text file?",
+                                                              QMessageBox::Yes | QMessageBox::No);
+    if (reply == QMessageBox::Yes) { // If the user wants to save the changes
+        // Save the text to a new file
+        QString modelPath = m_mainWindow->getModelPath();
+        QString fullPath = QFileDialog::getSaveFileName(this, "Save Text File",  modelPath, "Text files (*.txt)");
+        if (!fullPath.isEmpty()) { // If the user has selected a valid file name
+            QFile file(fullPath);
+            if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+                QTextStream stream(&file);
+                stream << promptTextEdit->toPlainText();
+                file.close();
+
+                // Add a new item to the end of the combobox
+                QFileInfo fileInfo(fullPath);
+                QString fileName = fileInfo.fileName();
+
+                int samePrompt = -1;
+                for (int i = 0; i < promptComboBox->count(); ++i) {
+                    QString itemText = promptComboBox->itemText(i);
+
+                    // Compare the item text with the filename
+                    if (itemText == fileName) {
+                        // Item with the same filename exists in the combobox
+                        samePrompt = i;
+                    }
+                }
+
+                if (samePrompt >= 0)
+                {
+                    promptComboBox->setCurrentIndex(samePrompt);
+                }
+                else
+                {
+                    promptComboBox->addItem(fileName);
+                    promptComboBox->setCurrentIndex(promptComboBox->count() - 1);
+                }
+            }
+        }
+    }
 }
 
 void EditDialog::initAzureSetting()
@@ -164,10 +194,10 @@ void EditDialog::populateComboBox()
     int modelIndex = m_mainWindow->getModelIndex();
 
     QDir directory(modelPath);
-    QStringList txtFiles = directory.entryList(QStringList() << "*.txt", QDir::Files, QDir::Time);
+    QStringList txtFiles = directory.entryList(QStringList() << "*.txt", QDir::Files, QDir::Name);
 
     initPrompts(modelIndex);
-    txtFiles = directory.entryList(QStringList() << "*.txt", QDir::Files, QDir::Time);
+    txtFiles = directory.entryList(QStringList() << "*.txt", QDir::Files, QDir::Name);
 
 
     for (int i = 0; i < txtFiles.size(); ++i)
@@ -192,12 +222,12 @@ QString EditDialog::parsePrompt(QString txtFileName)
     return text;
 }
 
-void EditDialog::loadPrompts(int promptIndex)
+void EditDialog::loadPrompts(int idx)
 {
     QString modelPath = m_mainWindow->getModelPath();
     QDir directory(modelPath);
-    QStringList txtFiles = directory.entryList(QStringList() << "*.txt", QDir::Files, QDir::Time);
-    QString promptFileName = txtFiles.at(promptIndex);
+    QStringList txtFiles = directory.entryList(QStringList() << "*.txt", QDir::Files, QDir::Name);
+    QString promptFileName = txtFiles.at(idx);
     QString text = parsePrompt(modelPath + promptFileName);
 
     promptTextEdit->clear();
@@ -263,7 +293,7 @@ void EditDialog::initPrompts(int modelIndex)
     }
 
     QString str;
-    rules.append(" ### Instruction ### \nYou are Albert Einstein and you know everything.  \n");
+    rules.append(" You are Albert Einstein and you know everything.  \n");
 
     str = "Your reply must be in JSON format with the following keys: Expression, Motion, Content \n";
     rules.append(str);

@@ -31,9 +31,11 @@ public:
     void initPrompts(int);
     QString parsePrompt(QString);
     void loadPrompts(int);
+    void saveNewPrompts();
 
 private:
     MainWindow *m_mainWindow;
+    int promptIndex = 0;
     void initAzureSetting();
 
 signals:
