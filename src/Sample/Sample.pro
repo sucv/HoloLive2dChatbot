@@ -10,6 +10,7 @@ greaterThan(QT_MAJOR_VERSION, 5){
 CONFIG += c++17
 TARGET = HoloBot
 
+DEFINES += QT_DEBUG_PLUGINS=1
 
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
@@ -36,11 +37,25 @@ linux-g++* {
 
     }
 
-    LIBS += -L$$PWD/AzureSDK/lib/x64 -lMicrosoft.CognitiveServices.Speech.core
-    LIBS += -L$$PWD/AzureSDK/lib/x64 -lMicrosoft.CognitiveServices.Speech.extension.audio.sys
-    LIBS += -L$$PWD/AzureSDK/lib/x64 -lMicrosoft.CognitiveServices.Speech.extension.codec
+    INCLUDEPATH += /usr/include/opencv4
+    LIBS += -L/usr/lib/x86_64-linux-gnu \
+        -lopencv_core \
+        -lopencv_highgui \
+        -lopencv_imgproc \
+
+    INCLUDEPATH += /usr/lib/x86_64-linux-gnu
+    LIBS += -L/lib/x86_64-linux-gnu \
+        -lcurl
+
+    INCLUDEPATH += \
+        AzureSDK/include/cxx_api \
+        AzureSDK/include/c_api
+    LIBS += -L$$PWD/AzureSDK/lib/Linux/x64 -lMicrosoft.CognitiveServices.Speech.core
+    LIBS += -L$$PWD/AzureSDK/lib/Linux/x64 -lMicrosoft.CognitiveServices.Speech.extension.audio.sys
+    LIBS += -L$$PWD/AzureSDK/lib/Linux/x64 -lMicrosoft.CognitiveServices.Speech.extension.codec
 
     DEFINES += CSM_TARGET_LINUX_GL
+    DEFINES += CV_IGNORE_DEBUG_BUILD_GUARD=1
 }
 
 win32-msvc*{
@@ -49,14 +64,12 @@ win32-msvc*{
         message(Debug build)
         LIBS += -L$$PWD/../Core/lib/windows/x86_64/142 -lLive2DCubismCore_MDd
         LIBS += -L$$PWD/../Core/lib/windows/x86_64/142 -lFrameworkd
-
     }
 
     CONFIG(release, debug|release){
         message(Release build)
         LIBS += -L$$PWD/../Core/lib/windows/x86_64/142 -lLive2DCubismCore_MD
         LIBS += -L$$PWD/../Core/lib/windows/x86_64/142 -lFramework
-
     }
 
     DEFINES += WIN32
@@ -69,6 +82,7 @@ win32-msvc*{
 
     INCLUDEPATH += $$PWD/opencv/include
     DEFINES += CV_IGNORE_DEBUG_BUILD_GUARD=1
+
     LIBS +=-L$$PWD/opencv/x64/vc16/lib \
             -lopencv_core470        \
             -lopencv_highgui470     \

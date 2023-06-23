@@ -83,9 +83,8 @@ void QLive2dWidget::mouseMoveEvent(QMouseEvent * event){
         int dy = event->globalPosition().y() - mouseLastPos.y();
         mouseLastPos = event->globalPosition();
 
-        QWidget *parent = parentWidget()->parentWidget();
-        if (parent) {
-            parent->move((parent->pos().x() + dx), (parent->pos().y() + dy));
+        if (QWidget* topLevelWidget = window()) {
+            topLevelWidget->move(topLevelWidget->pos() + QPoint(dx, dy));
         }
 
     }
