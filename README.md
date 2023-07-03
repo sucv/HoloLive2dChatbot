@@ -228,7 +228,36 @@ Now `\HoloBot` is a standalone package for the app!!
 #### Linux<a name="linux"></a>
 [Return to Table of Content](#table-of-content)
 
-To do...
+To build, The following commands are tested in Ubuntu 22.
+
+```
+# Do this to launch the GUI installer.
+sudo apt install  libxcb-xinerama0
+
+# Login to your Qt Account and download the Linux installer.
+# https://www.qt.io/download-thank-you?hsLang=en
+
+# Change to executable and install Qt as intended
+chmod +x qt-unified-linux-x64-4.5.2-online.run
+./qt-unified-linux-x64-4.5.2-online.run
+
+
+# Install curl for calling APIs from Azure
+sudo apt install libcurl4-openssl-dev
+
+# Necessaries to build the project
+sudo apt install build-essential
+
+# OpenCV and OpenGL
+sudo apt install libopencv-dev
+sudo apt install freeglut3-dev
+
+# Due to https://askubuntu.com/questions/1403619/# mongodb-install-fails-on-ubuntu-22-04-depends-on-libssl1-1-but-it-is-not-insta
+
+wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.0g-2ubuntu4_amd64.deb
+sudo dpkg -i libssl1.1_1.1.0g-2ubuntu4_amd64.deb
+
+```
 
 ## End Note<a name="end-note"></a>
 [Return to Table of Content](#table-of-content)
